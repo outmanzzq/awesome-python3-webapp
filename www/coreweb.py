@@ -1,7 +1,7 @@
-#!/usr/bin/env python
-# -*- coding:utf-8 -*-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 # author: zzq
-# 
+#
 
 
 import asyncio, os, inspect, logging, functools
@@ -41,7 +41,7 @@ def get_required_kw_args(fn):
     args = []
     params = inspect.signature(fn).parameters
     for name, param in params.items():
-        if param.kind == inspect.Parameter.KEYWORD_ONLY and param.deault == inspect.Parameter.empty:
+        if param.kind == inspect.Parameter.KEYWORD_ONLY and param.default == inspect.Parameter.empty:
             args.append(name)
     return tuple(args)
 
@@ -62,7 +62,7 @@ def has_named_kw_args(fn):
             return True
 
 
-def has_var_kw_args(fn):
+def has_var_kw_arg(fn):
     params = inspect.signature(fn).parameters
     for name, param in params.items():
         if param.kind == inspect.Parameter.VAR_KEYWORD:
@@ -79,16 +79,16 @@ def has_request_arg(fn):
             continue
         if found and (param.kind != inspect.Parameter.VAR_POSITIONAL and param.kind != inspect.Parameter.KEYWORD_ONLY and param.kind != inspect.Parameter.VAR_KEYWORD):
             raise ValueError('request parameter must be the last named parameter in function: %s%s' % (fn.__name__, str(sig)))
-        return found
+    return found
 
 
 class RequestHandler(object):
 
     def __init__(self, app, fn):
         self._app = app
-        self._fun = fn
+        self._func = fn
         self._has_request_arg = has_request_arg(fn)
-        self._has_var_kw_arg = has_var_kw_args(fn)
+        self._has_var_kw_arg = has_var_kw_arg(fn)
         self._has_named_kw_args = has_named_kw_args(fn)
         self._named_kw_args = get_named_kw_args(fn)
         self._required_kw_args = get_required_kw_args(fn)
@@ -125,22 +125,22 @@ class RequestHandler(object):
                     if name in kw:
                         copy[name] = kw[name]
                 kw = copy
-            for k, v in request.math_info.item():
+            for k, v in request.match_info.items():
                 if k in kw:
                     logging.warning('Duplicate arg name in named arg and kw args: %s' % k)
                 kw[k] = v
-            if self._has_request_arg:
-                kw['request'] = request
-            if self._required_kw_args:
-                for name in self._required_kw_args:
-                    if not name in kw:
-                        return web.HTTPBadRequest('Missing argument: %s' % name)
-            logging.info('call with args: %s' % str(kw))
-            try:
-                r = await self._fun(**kw)
-                return r
-            except APIError as e:
-                return dict(error=e.error, data=e.data, message=e.message)
+        if self._has_request_arg:
+            kw['request'] = request
+        if self._required_kw_args:
+            for name in self._required_kw_args:
+                if not name in kw:
+                    return web.HTTPBadRequest('Missing argument: %s' % name)
+        logging.info('call with args: %s' % str(kw))
+        try:
+            r = await self._func(**kw)
+            return r
+        except APIError as e:
+            return dict(error=e.error, data=e.data, message=e.message)
 
 
 def add_static(app):

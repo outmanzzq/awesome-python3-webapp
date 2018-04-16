@@ -21,13 +21,13 @@ class APIValueError(APIError):
         super(APIValueError, self).__init__('value:invalid', field, message)
 
 
-class APIResourceNoteFoundError(APIError):
+class APIResourceNotFoundError(APIError):
 
     def __init__(self, field, message=''):
-        super(APIResourceNoteFoundError, self).__init__('value:notfound', field, message)
+        super(APIResourceNotFoundError, self).__init__('value:notfound', field, message)
 
 
 class APIPermissionError(APIError):
 
     def __init__(self, message=''):
-        super(APIPermissionError, self).__init__('permission: forbidden', 'permission', message)
+        super(APIPermissionError, self).__init__('permission:forbidden', 'permission', message)

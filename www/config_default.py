@@ -5,11 +5,12 @@
 
 
 configs = {
+    'debug': True,
     'db': {
         'host': '127.0.0.1',
         'port': 8889,
-        'user': 'wwwdata',
-        'password': 'wwwdata',
+        'user': 'www',
+        'password': 'www',
         'db': 'awesome'
     },
     'session':{

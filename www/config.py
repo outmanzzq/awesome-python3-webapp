@@ -49,7 +49,7 @@ try:
     import config_override
     configs = merge(configs, config_override.configs)
 except ImportError:
-    raise ImportError
+    pass
 
 
 configs = toDict(configs)

@@ -12,7 +12,7 @@ from aiohttp import web
 from jinja2 import Environment, FileSystemLoader
 
 import orm
-from coreweb import add_routes, add_static
+from coroweb import add_routes, add_static
 
 
 def init_jinja2(app, **kw):
@@ -50,7 +50,7 @@ async def data_factory(app, handler):
             if request.content_type.startswith('application/json'):
                 request.__data__ = await request.json()
                 logging.info('request json: %s' % str(request.__data__))
-            elif request.content_type.startswith('application/x-www-urlencoded'):
+            elif request.content_type.startswith('application/x-www-form-urlencoded'):
                 request.__data__ = await request.post()
                 logging.info('request form: %s' % str(request.__data__))
         return await handler(request)
@@ -68,7 +68,7 @@ async def response_factory(app, handler):
             resp.content_type = 'application/octet-stream'
             return resp
         if isinstance(r, str):
-            if r.startswith('redirect'):
+            if r.startswith('redirect:'):
                 return web.HTTPFound(r[9:])
             resp = web.Response(body=r.encode('utf-8'))
             resp.content_type = 'text/html;charset=utf-8'
@@ -100,11 +100,11 @@ def datetime_filter(t):
     if delta < 60:
         return u'1分钟前'
     if delta < 3600:
-        return u'%s 分钟前' % (delta // 60)
+        return u'%s分钟前' % (delta // 60)
     if delta < 86400:
-        return u'%s 小时前' % (delta // 86400)
+        return u'%s小时前' % (delta // 3600)
     if delta < 604800:
-        return u'%s 天前' % (datetime // 604800)
+        return u'%s天前' % (delta // 86400)
     dt = datetime.fromtimestamp(t)
     return u'%s年%s月%s日' % (dt.year, dt.month, dt.day)
 

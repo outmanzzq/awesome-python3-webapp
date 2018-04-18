@@ -35,7 +35,7 @@ def kill_process():
         log('Kill process [%s]...' % process.pid)
         process.kill()
         process.wait()
-        log('Process ended with code: %s.' % process.returncode)
+        log('Process ended with code %s.' % process.returncode)
         process = None
 
 
@@ -50,7 +50,7 @@ def restart_process():
     start_process()
 
 
-def start_watch(path, classback):
+def start_watch(path, callback):
     observer = Observer()
     observer.schedule(MyFileSystemEventHander(restart_process), path, recursive=True)
     observer.start()
